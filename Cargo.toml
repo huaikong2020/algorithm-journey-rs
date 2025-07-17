@@ -1,0 +1,6 @@
+[package]
+name = "algorithm-journey"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
