@@ -72,6 +72,49 @@ fn heap_sort2(arr: &mut [i32]) {
     }
 }
 
+// https://leetcode.cn/problems/divide-intervals-into-minimum-number-of-groups/
+fn min_groups(intervals: Vec<Vec<i32>>) -> i32 {
+    let n = intervals.len();
+    let mut intervals = intervals;
+    intervals.sort_by_key(|x| x[0]);
+    // println!("intervals: {:?}", intervals);
+    let mut heap: BinaryHeap<Reverse<i32>> = BinaryHeap::new();
+    let mut ans = 0;
+    for i in 0..n {
+        while !heap.is_empty() && heap.peek().unwrap().0 < intervals[i][0] {
+            heap.pop();
+        }
+        heap.push(Reverse(intervals[i][1]));
+        ans = ans.max(heap.len() as i32);
+        // println!("heap: {:?}, ans: {}", heap, ans);
+    }
+    ans
+}
+
+//https://leetcode.cn/problems/minimum-operations-to-halve-array-sum/
+fn halve_array(nums: Vec<i32>) -> i32 {
+    // let values = nums.iter().map(|x| (*x as i64) << 20).collect::<Vec<i64>>();
+    let mut sum = 0;
+    let mut heap = BinaryHeap::from(
+        nums.iter()
+            .map(|x| {
+                let y = (*x as i64) << 20;
+                sum += y;
+                y
+            })
+            .collect::<Vec<i64>>(),
+    );
+    let mut ans = 0;
+    sum = sum / 2;
+    while sum > 0 {
+        let x = heap.pop().unwrap() >> 1;
+        ans += 1;
+        sum -= x;
+        heap.push(x);
+    }
+    ans
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -98,5 +141,18 @@ mod tests {
             println!("{:?}", a);
             a = ((a as i32 - 1) / 2) as usize;
         }
+    }
+
+    #[test]
+    fn test_min_groups() {
+        let intervals = vec![
+            vec![5, 10],
+            vec![6, 8],
+            vec![1, 5],
+            vec![2, 3],
+            vec![1, 10],
+            vec![9, 12],
+        ];
+        assert_eq!(min_groups(intervals), 3);
     }
 }
